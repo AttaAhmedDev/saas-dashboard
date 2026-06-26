@@ -1,0 +1,30 @@
+# FlowDesk — Multi-tenant SaaS Dashboard
+
+A full stack business analytics dashboard where companies sign up
+and see only their own data — revenue, orders, and team members.
+
+**Live demo:** https://FlowDesk.netlify.app  
+**API:** https://FlowDesk.railway.app
+
+## Tech Stack
+- **Backend:** Python, Flask, SQLAlchemy, PostgreSQL
+- **Auth:** JWT tokens with Flask-JWT-Extended
+- **Frontend:** HTML, CSS, JavaScript, Chart.js
+- **Deploy:** Railway (backend + DB), Netlify (frontend)
+
+## Features
+- Multi-tenant architecture — each company sees only its own data
+- JWT authentication — register, login, protected routes
+- Revenue chart, orders table, team management
+- REST API with 8 endpoints
+
+## Run locally
+\`\`\`bash
+git clone https://github.com/you/saas-dashboard
+cd saas-dashboard
+pip install -r requirements.txt
+cp .env.example .env   # fill in your values
+flask db upgrade
+python seed.py
+flask run
+\`\`\`

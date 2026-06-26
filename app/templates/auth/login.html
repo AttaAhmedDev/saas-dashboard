@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FlowDesk — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap"
+    rel="stylesheet" />
+<link rel="stylesheet" href="{{url_for('static',filename='css/login.css')}}">
+</head>
+<body>
+<!-- LEFT: brand panel -->
+<div class="panel-left">
+    <div class="brand">
+    <div class="brand-icon">
+        <svg
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
+        <rect
+            x="11"
+            y="2"
+            width="7"
+            height="7"
+            rx="1.5"
+            fill="white"
+            opacity="0.5" />
+        <rect
+            x="2"
+            y="11"
+            width="7"
+            height="7"
+            rx="1.5"
+            fill="white"
+            opacity="0.5" />
+        <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
+        </svg>
+    </div>
+    <span class="brand-name">FlowDesk</span>
+    </div>
+
+    <div class="panel-tagline">
+    <h1>Your business,<br /><em>clearly</em> visible.</h1>
+    <p>
+        One dashboard for every metric that matters — revenue, orders, and
+        your team — filtered by company, secured by design.
+    </p>
+    </div>
+
+    <div class="stats-row">
+    <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Data isolated per tenant</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">JWT</div>
+        <div class="stat-label">Stateless auth</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">Live</div>
+        <div class="stat-label">Real-time API</div>
+    </div>
+    </div>
+</div>
+
+<!-- RIGHT: auth form -->
+<div class="panel-right">
+    <div class="auth-box">
+    <div class="auth-toggle">
+        <button
+        class="toggle-btn active"
+        id="btn-login"
+        onclick="showLogin()">
+        Sign in
+        </button>
+        <button class="toggle-btn" id="btn-register" onclick="showRegister()">
+        Create account
+        </button>
+    </div>
+
+    <div id="error-msg" class="error-msg"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+        <h2 class="auth-title">Welcome back</h2>
+        <p class="auth-sub">Sign in to your company dashboard.</p>
+
+        <div class="field">
+        <label>Email</label>
+        <input
+            type="email"
+            id="login-email"
+            placeholder="you@company.com" />
+        </div>
+        <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" />
+        </div>
+
+        <button class="btn-primary" id="login-btn" onclick="login()">
+        <span id="login-label">Sign in</span>
+        <div class="spinner" id="login-spinner"></div>
+        </button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" style="display: none">
+        <h2 class="auth-title">Start for free</h2>
+        <p class="auth-sub">Create your company account in seconds.</p>
+
+        <div class="field">
+        <label>Company name</label>
+        <input type="text" id="reg-company" placeholder="Acme Corp" />
+        </div>
+        <div class="field">
+        <label>Your name</label>
+        <input type="text" id="reg-name" placeholder="Ahmed Ali" />
+        </div>
+        <div class="field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@company.com" />
+        </div>
+        <div class="field">
+        <label>Password</label>
+        <input
+            type="password"
+            id="reg-password"
+            placeholder="Min. 6 characters" />
+        </div>
+
+        <button class="btn-primary" id="reg-btn" onclick="register()">
+        <span id="reg-label">Create account</span>
+        <div class="spinner" id="reg-spinner"></div>
+        </button>
+
+        <div class="divider"></div>
+        <p class="terms">
+        By creating an account you agree to our Terms of Service and Privacy
+        Policy.
+        </p>
+    </div>
+    </div>
+</div>
+<script src="{{url_for('static',filename='js/login.js')}}">
+</script>
+</body>
+</html>
