@@ -3,8 +3,7 @@
 A full stack business analytics dashboard where companies sign up
 and see only their own data — revenue, orders, and team members.
 
-**Live demo:** https://FlowDesk.netlify.app  
-**API:** https://FlowDesk.railway.app
+**Live demo:** https://flowdesk-saas.up.railway.app
 
 ## Tech Stack
 - **Backend:** Python, Flask, SQLAlchemy, PostgreSQL
