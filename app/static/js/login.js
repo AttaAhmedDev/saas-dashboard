@@ -1,4 +1,4 @@
-const API = "http://localhost:5000/api";
+const API = "http://flowdesk-saas.up.railway.app/api";
 
     function showLogin() {
     document.getElementById("login-form").style.display = "block";

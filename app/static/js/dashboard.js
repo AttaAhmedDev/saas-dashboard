@@ -1,4 +1,4 @@
-const API = "http://localhost:5000/api";
+const API = "https://flowdesk-saas.up.railway.app/api";
     const token = localStorage.getItem("token");
 
     // redirect if not logged in
