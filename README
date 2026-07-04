@@ -9,7 +9,7 @@ and see only their own data — revenue, orders, and team members.
 - **Backend:** Python, Flask, SQLAlchemy, PostgreSQL
 - **Auth:** JWT tokens with Flask-JWT-Extended
 - **Frontend:** HTML, CSS, JavaScript, Chart.js
-- **Deploy:** Railway (backend + DB), Netlify (frontend)
+- **Deploy:** Railway (backend + DB +frontend)
 
 ## Features
 - Multi-tenant architecture — each company sees only its own data

@@ -2,23 +2,10 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import db, bcrypt
 from app.models import User, Company
-import re
 from werkzeug.security import check_password_hash, generate_password_hash
-from app.utils import get_current_user
+from app.utils import get_current_user, is_valid_email, make_slug
 
 auth_bp = Blueprint("auth", __name__)
-
-
-# ── helpers ──────────────────────────────────────────────────────
-
-
-def is_valid_email(email):
-    return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
-
-
-def make_slug(name):
-    """'Acme Corp' → 'acme-corp'"""
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 # ── POST /api/auth/register ──────────────────────────────────────────

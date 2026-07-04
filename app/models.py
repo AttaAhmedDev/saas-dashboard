@@ -2,6 +2,54 @@ from app import db
 from datetime import datetime, timezone
 
 
+# Permission constants
+class Permissions:
+    VIEW_DASHBOARD = "view_dashboard"
+    MANAGE_ORDERS = "manage_orders"
+    VIEW_REVENUE = "view_revenue"
+    MANAGE_USERS = "manage_users"
+    MANAGE_ROLES = "manage_roles"
+    COMPANY_SETTINGS = "company_settings"
+
+
+ROLE_PERMISSIONS = {
+    "owner": [
+        Permissions.VIEW_DASHBOARD,
+        Permissions.MANAGE_ORDERS,
+        Permissions.VIEW_REVENUE,
+        Permissions.MANAGE_USERS,
+        Permissions.MANAGE_ROLES,
+        Permissions.COMPANY_SETTINGS,
+    ],
+    "admin": [
+        Permissions.VIEW_DASHBOARD,
+        Permissions.MANAGE_ORDERS,
+        Permissions.VIEW_REVENUE,
+        Permissions.MANAGE_USERS,
+        Permissions.MANAGE_ROLES,
+    ],
+    "manager": [
+        Permissions.VIEW_DASHBOARD,
+        Permissions.MANAGE_ORDERS,
+        Permissions.VIEW_REVENUE,
+    ],
+    "sales": [
+        Permissions.VIEW_DASHBOARD,
+        Permissions.MANAGE_ORDERS,
+    ],
+    "accountant": [
+        Permissions.VIEW_DASHBOARD,
+        Permissions.VIEW_REVENUE,
+    ],
+    "hr": [
+        Permissions.MANAGE_USERS,
+    ],
+    "employee": [
+        Permissions.VIEW_DASHBOARD,
+    ],
+}
+
+
 class Company(db.Model):
     __tablename__ = "companies"
 
@@ -44,6 +92,14 @@ class User(db.Model):
             "role": self.role,
             "created_at": self.created_at.isoformat(),
         }
+
+    def get_permissions(self):
+        """Returns the list of permissions for this user's role."""
+        # ROLE_PERMISSIONS[index] this not good as if role not exist ,python raises exception.
+        return ROLE_PERMISSIONS.get(self.role, [])
+
+    def has_permission(self, permission):
+        return permission in self.get_permissions()
 
 
 class Revenue(db.Model):
