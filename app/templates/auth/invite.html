@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowDesk — Accept Invite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}" />
+  </head>
+  <body>
+    <div class="panel-left">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
+            <rect
+              x="11"
+              y="2"
+              width="7"
+              height="7"
+              rx="1.5"
+              fill="white"
+              opacity="0.5" />
+            <rect
+              x="2"
+              y="11"
+              width="7"
+              height="7"
+              rx="1.5"
+              fill="white"
+              opacity="0.5" />
+            <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
+          </svg>
+        </div>
+        <span class="brand-name">FlowDesk</span>
+      </div>
+
+      <div class="panel-tagline">
+        <h1>Accept your invite<br /><em>and join</em> the team.</h1>
+        <p>
+          Complete your account setup with a password and access your company
+          dashboard.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel-right">
+      <div class="auth-box">
+        <div id="error-msg" class="error-msg"></div>
+
+        <div id="invite-info">
+          <h2 class="auth-title">You're invited</h2>
+          <p class="auth-sub">
+            Join {{ invite.name }} on {{ invite.company_name }} as
+            <strong>{{ invite.role }}</strong>.
+          </p>
+
+          <div class="field">
+            <label>Full name</label>
+            <input
+              type="text"
+              id="invite-name"
+              value="{{ invite.name }}"
+              readonly />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input
+              type="email"
+              id="invite-email"
+              value="{{ invite.email }}"
+              readonly />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input
+              type="password"
+              id="invite-password"
+              placeholder="Create a password" />
+          </div>
+
+          <button
+            class="btn-primary"
+            id="invite-submit-btn"
+            onclick="acceptInvite()">
+            <span id="invite-label">Accept invite</span>
+            <div class="spinner" id="invite-spinner"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const INVITE_TOKEN = "{{ token }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/shared.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/invite.js') }}"></script>
+  </body>
+</html>

@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime, timezone
+from uuid import uuid4
 
 
 # Permission constants
@@ -47,6 +48,9 @@ ROLE_PERMISSIONS = {
     "employee": [
         Permissions.VIEW_DASHBOARD,
     ],
+    "member": [
+        Permissions.VIEW_DASHBOARD,
+    ],
 }
 
 
@@ -62,6 +66,7 @@ class Company(db.Model):
     users = db.relationship("User", backref="company", lazy=True)
     revenues = db.relationship("Revenue", backref="company", lazy=True)
     orders = db.relationship("Order", backref="company", lazy=True)
+    invites = db.relationship("Invite", backref="company", lazy=True)
 
     def to_dict(self):
         return {
@@ -80,7 +85,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)  # hashed
     name = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(20), default="member")  # 'admin' or 'member'
+    role = db.Column(db.String(20), default="employee")  # default role for new users
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
@@ -90,6 +95,7 @@ class User(db.Model):
             "email": self.email,
             "name": self.name,
             "role": self.role,
+            "permissions": self.get_permissions(),
             "created_at": self.created_at.isoformat(),
         }
 
@@ -100,6 +106,35 @@ class User(db.Model):
 
     def has_permission(self, permission):
         return permission in self.get_permissions()
+
+
+class Invite(db.Model):
+    __tablename__ = "invites"
+
+    id = db.Column(db.Integer, primary_key=True)
+    company_id = db.Column(db.Integer, db.ForeignKey("companies.id"), nullable=False)
+    invited_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    email = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+    token = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    status = db.Column(db.String(20), default="pending")
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    accepted_at = db.Column(db.DateTime, nullable=True)
+
+    invited_by = db.relationship("User", foreign_keys=[invited_by_id])
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "company_id": self.company_id,
+            "email": self.email,
+            "name": self.name,
+            "role": self.role,
+            "status": self.status,
+            "created_at": self.created_at.isoformat(),
+            "accepted_at": self.accepted_at.isoformat() if self.accepted_at else None,
+        }
 
 
 class Revenue(db.Model):

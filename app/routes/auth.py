@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import db, bcrypt
-from app.models import User, Company
+from app.models import User, Company, Invite
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.utils import get_current_user, is_valid_email, make_slug
+from datetime import datetime, timezone
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -39,12 +40,15 @@ def register():
 
     # 4. create user with hashed password
     hashed_pw = generate_password_hash(data["password"])
+    # Check if this is the first user of the company
+    user_count = User.query.filter_by(company_id=company.id).count()
+    user_role = "owner" if user_count == 0 else "admin"
     user = User(
         company_id=company.id,
         email=data["email"],
         password=hashed_pw,
         name=data["name"],
-        role="admin",  # ---first user of company is always admin----
+        role=user_role,
     )
     db.session.add(user)
     db.session.commit()
@@ -104,6 +108,64 @@ def login():
             }
         ),
         200,
+    )
+
+
+# ── GET /api/auth/invite/<token> — get invite details
+@auth_bp.route("/invite/<token>", methods=["GET"])
+def get_invite(token):
+    invite = Invite.query.filter_by(token=token, status="pending").first()
+    if not invite:
+        return jsonify({"error": "Invite not found or expired"}), 404
+
+    return jsonify({"invite": invite.to_dict()}), 200
+
+
+# ── POST /api/auth/invite/<token> — accept invite
+@auth_bp.route("/invite/<token>", methods=["POST"])
+def accept_invite(token):
+    data = request.get_json() or {}
+    password = data.get("password")
+
+    if not password or len(password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+
+    invite = Invite.query.filter_by(token=token, status="pending").first()
+    if not invite:
+        return jsonify({"error": "Invite not found or expired"}), 404
+
+    if User.query.filter_by(email=invite.email).first():
+        return jsonify({"error": "A user with this email already exists"}), 409
+
+    hashed_pw = generate_password_hash(password)
+    user = User(
+        company_id=invite.company_id,
+        email=invite.email,
+        password=hashed_pw,
+        name=invite.name,
+        role=invite.role,
+    )
+    db.session.add(user)
+
+    invite.status = "accepted"
+    invite.accepted_at = datetime.now(timezone.utc)
+    db.session.commit()
+
+    token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"company_id": user.company_id, "role": user.role},
+    )
+
+    return (
+        jsonify(
+            {
+                "message": "Invite accepted",
+                "token": token,
+                "user": user.to_dict(),
+                "company": user.company.to_dict(),
+            }
+        ),
+        201,
     )
 
 

@@ -1,28 +1,93 @@
+# Virtual environments
+saas_env/
+venv/
+.venv/
+env/
+ENV/
+environment/
+
 # Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
+*.pyo
+*.pyd
+.Python
 
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
+# Distributions
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Environment variables
+# Environment variables & secrets
 .env
+.env.local
+.env.*.local
+.env.production.local
 
 # Flask
 instance/
 .flask_session/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+app.db
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+htmlcov/
 
 # Logs
 *.log
+logs/
+debug_logs/
 
-# IDEs
-.vscode/
-.idea/
+# OS
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
 
-# Pytest
-.pytest_cache/
+# Alembic
+migrations/versions/__pycache__/
+
+# Misc
+.env.example (uncomment to track)
+dist/
+*.pem
+*.key

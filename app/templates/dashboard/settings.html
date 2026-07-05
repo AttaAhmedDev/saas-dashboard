@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FlowDesk — Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+</head>
+<body>
+
+<div class="loading-overlay show" id="loading">
+  <div class="spinner"></div>
+  <span style="font-size:14px;color:var(--ink-muted)">Loading settings…</span>
+</div>
+
+<nav class="sidebar" id="sidebar"></nav>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Company and profile settings</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="panel">
+      <div class="panel-header">
+        <div><div class="panel-title">Company</div><div class="panel-sub">Your company information</div></div>
+      </div>
+      <div style="display:grid;gap:18px">
+        <div><div class="card-label">Name</div><div class="card-value" id="company-name">—</div></div>
+        <div><div class="card-label">Slug</div><div class="card-value" id="company-slug">—</div></div>
+        <div><div class="card-label">Company ID</div><div class="card-value" id="company-id">—</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div><div class="panel-title">Profile</div><div class="panel-sub">Your user account</div></div>
+      </div>
+      <div style="display:grid;gap:18px">
+        <div><div class="card-label">Name</div><div class="card-value" id="user-name">—</div></div>
+        <div><div class="card-label">Email</div><div class="card-value" id="user-email">—</div></div>
+        <div><div class="card-label">Role</div><div class="card-value" id="user-role">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div><div class="panel-title">Important</div><div class="panel-sub">Current application behavior</div></div>
+    </div>
+    <p style="color:var(--ink-muted);line-height:1.8;max-width:760px">
+      This page shows your current profile and company information from the logged-in session. Settings changes are not persisted yet — they are shown here in the same modern dashboard style.
+    </p>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='js/shared.js') }}"></script>
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FlowDesk — Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap"
+    rel="stylesheet" />
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/shared.css') }}" />
+</head>
+<body>
+<div class="loading-overlay show" id="loading">
+    <div class="spinner"></div>
+    <span style="font-size: 14px; color: var(--ink-muted)"
+    >Loading team members…</span
+    >
+</div>
+
+<nav class="sidebar" id="sidebar"></nav>
+
+<main class="main">
+    <div class="topbar">
+    <div>
+        <div class="page-title">Team</div>
+        <div class="page-sub">Manage your company users</div>
+    </div>
+        <button class="btn btn-primary" onclick="openInviteModal()">
+    <div class="card">
+        <div class="card-label">Total members</div>
+        <div class="card-value" id="member-count">—</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Owners</div>
+        <div class="card-value" id="owner-count">—</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Admins</div>
+        <div class="card-value" id="admin-count">—</div>
+    </div>
+    </div>
+
+    <div class="panel">
+    <div class="panel-header">
+        <div>
+        <div class="panel-title">People</div>
+        <div class="panel-sub">All users in your company</div>
+        </div>
+        <span class="pill pill-muted" id="role-summary">—</span>
+    </div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th style="width: 50px; text-align: center;">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="users-body">
+        <tr>
+            <td colspan="5" style="color: var(--ink-muted); padding: 20px 0">
+            Loading…
+            </td>
+        </tr>
+        </tbody>
+</table>
+    </div>
+</main>
+
+<div class="modal-backdrop" id="invite-modal">
+    <div class="modal">
+    <div class="modal-title">Invite team member</div>
+    <div class="modal-sub">Send an invitation link to a new user.</div>
+    <div class="field">
+        <label>Name</label>
+        <input type="text" id="invite-name" placeholder="Jane Doe" />
+    </div>
+    <div class="field">
+        <label>Email</label>
+        <input type="email" id="invite-email" placeholder="jane@company.com" />
+    </div>
+    <div class="field">
+        <label>Role</label>
+        <select id="invite-role" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--white);outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);width:100%">
+        <option value="employee">Employee</option>
+        <option value="sales">Sales</option>
+        <option value="accountant">Accountant</option>
+        <option value="hr">HR</option>
+        <option value="manager">Manager</option>
+        <option value="admin">Admin</option>
+        </select>
+</div>
+    <div id="invite-error" style="display:none;color:var(--error);font-size:13px;margin-bottom:12px"></div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('invite-modal')">Cancel</button>
+        <button class="btn btn-primary" id="invite-submit-btn" onclick="submitInvite()"><i class="ti ti-send"></i> Send invite</button>
+    </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="edit-role-modal">
+    <div class="modal">
+    <div class="modal-title">Edit role</div>
+    <div class="modal-sub" id="edit-role-user-name">Change team member role</div>
+    <div class="field">
+        <label>New role</label>
+        <select id="edit-role-select" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--white);outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);width:100%">
+        <option value="employee">Employee</option>
+        <option value="sales">Sales</option>
+        <option value="accountant">Accountant</option>
+        <option value="hr">HR</option>
+        <option value="manager">Manager</option>
+        <option value="admin">Admin</option>
+        <option value="owner">Owner</option>
+        </select>
+    </div>
+    <div id="edit-role-error" style="display:none;color:var(--error);font-size:13px;margin-bottom:12px"></div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('edit-role-modal')">Cancel</button>
+        <button class="btn btn-primary" id="edit-role-submit-btn" onclick="submitEditRole()"><i class="ti ti-check"></i> Update role</button>
+    </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/shared.js') }}"></script>
+<script src="{{ url_for('static', filename='js/team.js') }}"></script>
+</body>
+</html>

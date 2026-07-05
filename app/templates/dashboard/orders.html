@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowDesk — Orders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/shared.css') }}" />
+  </head>
+  <body>
+    <div class="loading-overlay show" id="loading">
+      <div class="spinner"></div>
+      <span style="font-size: 14px; color: var(--ink-muted)"
+        >Loading orders…</span
+      >
+    </div>
+
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Orders</div>
+          <div class="page-sub">All orders for your company</div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <select
+            id="status-select"
+            style="
+              padding: 9px 12px;
+              border: 1.5px solid var(--border);
+              border-radius: 10px;
+              background: var(--white);
+              outline: none;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 13px;
+              color: var(--ink);
+            ">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <input
+            id="search-input"
+            placeholder="Search customer or product"
+            style="
+              padding: 9px 12px;
+              border: 1.5px solid var(--border);
+              border-radius: 10px;
+              background: var(--white);
+              outline: none;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 13px;
+              color: var(--ink);
+              width: 220px;
+            " />
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom: 24px">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Order list</div>
+            <div class="panel-sub">Review all company orders</div>
+          </div>
+          <div
+            style="font-size: 13px; color: var(--ink-muted)"
+            id="orders-count">
+            — orders
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Product</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="orders-body">
+            <tr>
+              <td colspan="6" style="color: var(--ink-muted); padding: 20px 0">
+                Loading…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <div class="modal-backdrop" id="order-modal">
+      <div class="modal">
+        <div class="modal-title" id="order-modal-title">New Order</div>
+        <div class="modal-sub" id="order-modal-sub">
+          Create or update an order
+        </div>
+
+        <div class="field">
+          <label>Customer</label>
+          <input type="text" id="order-customer" placeholder="Customer name" />
+        </div>
+        <div class="field">
+          <label>Product</label>
+          <input type="text" id="order-product" placeholder="Product name" />
+        </div>
+        <div class="field">
+          <label>Amount</label>
+          <input type="number" id="order-amount" placeholder="99" />
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select
+            id="order-status"
+            style="
+              padding: 9px 12px;
+              border: 1.5px solid var(--border);
+              border-radius: 10px;
+              background: var(--white);
+              outline: none;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 13px;
+              color: var(--ink);
+            ">
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div
+          id="order-error"
+          style="
+            display: none;
+            color: var(--error);
+            font-size: 13px;
+            margin-bottom: 12px;
+          "></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('order-modal')">
+            Cancel
+          </button>
+          <button
+            class="btn btn-primary"
+            id="order-submit-btn"
+            onclick="submitOrder()">
+            Save order
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/shared.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/orders.js') }}"></script>
+  </body>
+</html>

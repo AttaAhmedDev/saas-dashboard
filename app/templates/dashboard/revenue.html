@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowDesk — Revenue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='css/shared.css')}}" />
+    <style>
+      .active-chart-btn {
+        background: var(--accent-lt) !important;
+        color: var(--accent) !important;
+      }
+      .chart-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+      @media (max-width: 900px) {
+        .chart-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- loading overlay -->
+    <div class="loading-overlay show" id="loading">
+      <div class="spinner"></div>
+      <span style="font-size: 14px; color: var(--ink-muted)"
+        >Loading revenue data…</span
+      >
+    </div>
+
+    <!-- sidebar built by shared.js -->
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <main class="main">
+      <!-- topbar -->
+      <div class="topbar">
+        <div>
+          <div class="page-title">Revenue</div>
+          <div class="page-sub">Monthly income breakdown for your company</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="ti ti-plus"></i> Add record
+        </button>
+      </div>
+
+      <!-- stat cards -->
+      <div class="grid-4" style="margin-bottom: 24px">
+        <div class="card">
+          <div class="card-label">Total revenue</div>
+          <div class="card-value" id="stat-total">—</div>
+          <span id="stat-growth-tag">
+            <span
+              class="card-tag"
+              style="background: var(--success-lt); color: var(--success)"
+              >All time</span
+            >
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-label">Best month</div>
+          <div class="card-value" id="stat-best">—</div>
+          <span class="card-tag pill-accent" id="stat-best-label">—</span>
+        </div>
+        <div class="card">
+          <div class="card-label">Monthly average</div>
+          <div class="card-value" id="stat-avg">—</div>
+          <span class="card-tag pill-muted">Per month</span>
+        </div>
+        <div class="card">
+          <div class="card-label">Months tracked</div>
+          <div class="card-value" id="stat-count">—</div>
+          <span class="card-tag pill-muted">Records</span>
+        </div>
+      </div>
+
+      <!-- charts -->
+      <div class="chart-grid">
+        <!-- bar / line chart -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Monthly revenue</div>
+              <div class="panel-sub">All recorded months</div>
+            </div>
+            <div style="display: flex; gap: 6px">
+              <button
+                id="btn-bar"
+                class="btn btn-secondary active-chart-btn"
+                style="padding: 5px 10px; font-size: 12px"
+                onclick="setChartType('bar')"
+                title="Bar chart">
+                <i class="ti ti-chart-bar"></i>
+              </button>
+              <button
+                id="btn-line"
+                class="btn btn-secondary"
+                style="padding: 5px 10px; font-size: 12px"
+                onclick="setChartType('line')"
+                title="Line chart">
+                <i class="ti ti-chart-line"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="main-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- donut chart -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Revenue share</div>
+              <div class="panel-sub">Top months by contribution</div>
+            </div>
+          </div>
+          <div
+            style="
+              position: relative;
+              height: 220px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            ">
+            <canvas id="donut-chart"></canvas>
+            <div
+              style="
+                position: absolute;
+                text-align: center;
+                pointer-events: none;
+              ">
+              <div
+                style="
+                  font-family: &quot;DM Mono&quot;, monospace;
+                  font-size: 16px;
+                  font-weight: 500;
+                  color: var(--ink);
+                "
+                id="donut-center-val">
+                —
+              </div>
+              <div style="font-size: 11px; color: var(--ink-muted)">total</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- monthly breakdown table -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Monthly breakdown</div>
+            <div class="panel-sub">Full record — sortable</div>
+          </div>
+          <select
+            id="sort-select"
+            onchange="renderTable()"
+            style="
+              padding: 7px 12px;
+              border: 1.5px solid var(--border);
+              border-radius: 8px;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 13px;
+              color: var(--ink);
+              background: var(--white);
+              outline: none;
+              cursor: pointer;
+            ">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="highest">Highest amount</option>
+            <option value="lowest">Lowest amount</option>
+          </select>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Revenue</th>
+              <th>vs previous</th>
+              <th>Share of total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="revenue-body">
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <i class="ti ti-loader"></i> Loading…
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Add Revenue Modal -->
+    <div class="modal-backdrop" id="add-modal">
+      <div class="modal">
+        <div class="modal-title">Add revenue record</div>
+        <div class="modal-sub">
+          Add a new monthly revenue entry for your company.
+        </div>
+        <div class="field">
+          <label>Month</label>
+          <input type="month" id="add-month" />
+        </div>
+        <div class="field">
+          <label>Revenue amount ($)</label>
+          <input
+            type="number"
+            id="add-amount"
+            placeholder="e.g. 15000"
+            min="0"
+            onkeydown="if (event.key === 'Enter') submitRevenue();" />
+        </div>
+        <div
+          id="add-error"
+          style="
+            display: none;
+            color: var(--error);
+            font-size: 13px;
+            margin-bottom: 12px;
+          "></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('add-modal')">
+            Cancel
+          </button>
+          <button
+            class="btn btn-primary"
+            id="add-submit-btn"
+            onclick="submitRevenue()">
+            <i class="ti ti-check"></i> Save record
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-backdrop" id="delete-modal">
+      <div class="modal">
+        <div class="modal-title" style="color: var(--error)">Delete record</div>
+        <div class="modal-sub" id="delete-modal-sub">
+          Are you sure? This cannot be undone.
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('delete-modal')">
+            Cancel
+          </button>
+          <button class="btn btn-danger" onclick="confirmDelete()">
+            <i class="ti ti-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{url_for('static',filename='js/shared.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="{{url_for('static',filename='js/revenue.js')}}"></script>
+  </body>
+</html>

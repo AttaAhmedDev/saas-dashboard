@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FlowDesk — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="{{url_for('static',filename='css/shared.css')}}">  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="{{url_for('static',filename='js/shared.js')}}"></script>
+
+</head>
+<body>
+
+<div class="loading-overlay show" id="loading">
+  <div class="spinner"></div>
+  <span style="font-size:14px;color:var(--ink-muted)">Loading dashboard…</span>
+</div>
+
+<nav class="sidebar" id="sidebar"></nav>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="welcome-sub">Welcome back</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 14px 6px 8px;font-size:13px;font-weight:500;color:var(--ink-soft)">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--success)"></div>
+      <span id="company-badge">—</span>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-label">Total revenue</div>
+      <div class="card-value" id="stat-revenue">—</div>
+      <span class="card-tag" style="background:var(--success-lt);color:var(--success)">All time</span>
+    </div>
+    <div class="card">
+      <div class="card-label">This month</div>
+      <div class="card-value" id="stat-month">—</div>
+      <span class="card-tag pill-accent">Current</span>
+    </div>
+    <div class="card">
+      <div class="card-label">Total orders</div>
+      <div class="card-value" id="stat-orders">—</div>
+      <span class="card-tag pill-warning" id="stat-completed-tag">—</span>
+    </div>
+    <div class="card">
+      <div class="card-label">Team members</div>
+      <div class="card-value" id="stat-users">—</div>
+      <span class="card-tag pill-muted">Active</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div class="panel" id="revenue-panel">
+        <div class="panel-header">
+          <div><div class="panel-title">Revenue over time</div><div class="panel-sub">Monthly breakdown</div></div>
+          <a href="revenue" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">View all <i class="ti ti-arrow-right"></i></a>
+        </div>
+        <div class="chart-wrap"><canvas id="revenue-chart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div><div class="panel-title">Recent orders</div><div class="panel-sub">Last 10 transactions</div></div>
+          <a href="orders" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">View all <i class="ti ti-arrow-right"></i></a>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="orders-body"><tr><td colspan="4" style="color:var(--ink-muted);padding:20px 0">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="team-panel">
+      <div class="panel-header">
+        <div><div class="panel-title">Team</div><div class="panel-sub">Company members</div></div>
+        <a href="team" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">Manage <i class="ti ti-arrow-right"></i></a>
+      </div>
+      <div id="users-list"><div style="color:var(--ink-muted);font-size:14px">Loading…</div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  requireAuth();
+  buildSidebar('dashboard');
+
+  const user    = getUser();
+  const company = getCompany();
+  document.getElementById('welcome-sub').textContent   = 'Welcome back, ' + (user.name ? user.name.split(' ')[0] : '');
+  document.getElementById('company-badge').textContent = company.name || '—';
+
+  if (!hasPermission(Perms.VIEW_REVENUE))  document.getElementById('revenue-panel').style.display = 'none';
+  if (!hasPermission(Perms.MANAGE_USERS))  document.getElementById('team-panel').style.display = 'none';
+
+  async function loadSummary() {
+    const res  = await fetch(API + '/dashboard/summary', { headers: authHeaders() });
+    const data = await res.json();
+    document.getElementById('stat-revenue').textContent       = fmtMoney(data.total_revenue);
+    document.getElementById('stat-month').textContent         = fmtMoney(data.month_revenue);
+    document.getElementById('stat-orders').textContent        = data.total_orders;
+    document.getElementById('stat-users').textContent         = data.total_users;
+    document.getElementById('stat-completed-tag').textContent = data.completed_orders + ' completed';
+  }
+
+  async function loadRevenue() {
+    if (!hasPermission(Perms.VIEW_REVENUE)) return;
+    const res    = await fetch(API + '/dashboard/revenue', { headers: authHeaders() });
+    const data   = await res.json();
+    const labels  = (data.revenue || []).map(r => fmtMonth(r.month));
+    const amounts = (data.revenue || []).map(r => r.amount);
+    new Chart(document.getElementById('revenue-chart'), {
+      type: 'bar',
+      data: { labels, datasets: [{ data: amounts, backgroundColor: 'rgba(46,91,255,0.12)', borderColor: '#2e5bff', borderWidth: 2, borderRadius: 6 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 12 }, color: '#9299a8' } },
+          y: { grid: { color: '#f0f0f3' }, ticks: { font: { family: 'DM Mono', size: 11 }, color: '#9299a8', callback: v => '$' + (v/1000).toFixed(0) + 'k' } }
+        }
+      }
+    });
+  }
+
+  async function loadOrders() {
+    const res  = await fetch(API + '/dashboard/orders', { headers: authHeaders() });
+    const data = await res.json();
+    const orders = (data.orders || []).slice(0, 10);
+    const tbody  = document.getElementById('orders-body');
+    if (!orders.length) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-muted);padding:20px 0">No orders yet.</td></tr>'; return; }
+    const sc = s => ({ completed:'pill-success', pending:'pill-warning', cancelled:'pill-error' }[s] || 'pill-muted');
+    tbody.innerHTML = orders.map(o => '<tr><td>'+o.customer+'</td><td style="color:var(--ink-muted)">'+o.product+'</td><td style="font-family:\'DM Mono\',monospace">'+fmtMoney(o.amount)+'</td><td><span class="pill '+sc(o.status)+'">'+o.status+'</span></td></tr>').join('');
+  }
+
+  async function loadUsers() {
+    if (!hasPermission(Perms.MANAGE_USERS)) return;
+    const res  = await fetch(API + '/dashboard/users', { headers: authHeaders() });
+    const data = await res.json();
+    const list = document.getElementById('users-list');
+    if (!(data.users||[]).length) { list.innerHTML = '<div style="color:var(--ink-muted);font-size:14px">No team members yet.</div>'; return; }
+    list.innerHTML = data.users.map(u => {
+      const ini = u.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><div style="width:34px;height:34px;border-radius:50%;background:var(--accent-lt);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">'+ini+'</div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--ink)">'+u.name+'</div><div style="font-size:12px;color:var(--ink-muted)">'+u.email+'</div></div><span class="pill role-'+u.role+'">'+u.role+'</span></div>';
+    }).join('');
+  }
+
+  async function init() {
+    try { await Promise.all([loadSummary(), loadRevenue(), loadOrders(), loadUsers()]); }
+    finally { document.getElementById('loading').classList.remove('show'); }
+  }
+
+  init();
+</script>
+</body>
+</html>
