@@ -4,9 +4,9 @@ A full-stack, multi-tenant SaaS dashboard for business analytics. Companies sign
 
 **Live demo:** https://flowdesk-saas.up.railway.app
 
-### Dashboard
+### sign in
 
-![Dashboard](Screenshot_1.png)
+![sign in](Screenshot_2.png)
 
 ## ✨ Features
 
@@ -18,6 +18,11 @@ A full-stack, multi-tenant SaaS dashboard for business analytics. Companies sign
 - 🔑 **Role-Based Access Control (RBAC)** — 8 predefined roles with granular permissions
 - 📱 **REST API** — Full programmatic access to all features
 
+### Dashboard
+
+![Dashboard](Screenshot_3.png)
+
+
 ### Roles & Permissions
 - **Owner** — Full company access (company settings, user management, role assignment)
 - **Admin** — Administrative access (cannot assign owner role, cannot edit company settings)
@@ -27,6 +32,11 @@ A full-stack, multi-tenant SaaS dashboard for business analytics. Companies sign
 - **HR** — Manage users
 - **Employee** — Dashboard access only
 - **Member** — Dashboard access only
+
+### revenue
+
+![revenue](Screenshot_1.png)
+
 
 ## 🛠 Tech Stack
 
